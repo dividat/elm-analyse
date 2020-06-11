@@ -29,8 +29,18 @@ function loadFromElmHome(_a, directory) {
     var name = _a.name, version = _a.version;
     var projectElmJson = path.resolve(directory, 'elm.json');
     var elmVersion = require(projectElmJson)['elm-version'];
+    var packagesDir = (function () {
+        switch (elmVersion) {
+            case '0.19.0':
+                return 'package';
+            case '0.19.1':
+                return 'packages';
+            default:
+                throw Error("Unable to load docs.json from ELM_HOME for elm version " + elmVersion);
+        }
+    })();
     var elmHome = process.env.ELM_HOME || path.resolve(os.homedir(), '.elm');
-    var docsJsonPath = path.resolve(elmHome, elmVersion, 'package', name, version, 'docs.json');
+    var docsJsonPath = path.resolve(elmHome, elmVersion, packagesDir, name, version, 'docs.json');
     return require(docsJsonPath);
 }
 function setup(app, directory) {
