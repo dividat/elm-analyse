@@ -25,8 +25,18 @@ function loadFromPackageSite({ name, version }: DependencyPointer, cb: (result: 
 function loadFromElmHome({ name, version }: DependencyPointer, directory: string) {
     const projectElmJson = path.resolve(directory, 'elm.json');
     const elmVersion = require(projectElmJson)['elm-version'];
+    const packagesDir = (function() {
+        switch (elmVersion) {
+            case '0.19.0':
+                return 'package';
+            case '0.19.1':
+                return 'packages';
+            default:
+                throw Error(`Unable to load docs.json from ELM_HOME for elm version ${elmVersion}`);
+        }
+    })();
     const elmHome = process.env.ELM_HOME || path.resolve(os.homedir(), '.elm');
-    const docsJsonPath = path.resolve(elmHome, elmVersion, 'package', name, version, 'docs.json');
+    const docsJsonPath = path.resolve(elmHome, elmVersion, packagesDir, name, version, 'docs.json');
     return require(docsJsonPath);
 }
 
